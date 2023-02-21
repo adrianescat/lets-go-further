@@ -26,6 +26,6 @@ func (app *application) readIDParam(r *http.Request) (int64, error) {
 	if err != nil || id < 1 {
 		return 0, errors.New("invalid id parameter")
 	}
-	
+
 	return id, nil
 }
