@@ -7,8 +7,6 @@ import (
 	"time"
 )
 
-// Add a createMovieHandler for the "POST /v1/movies" endpoint. For now, we simply
-// return a plain-text placeholder response.
 func (app *application) createMovieHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "create a new movie")
 }
@@ -17,7 +15,8 @@ func (app *application) showMovieHandler(w http.ResponseWriter, r *http.Request)
 	id, err := app.readIDParam(r)
 
 	if err != nil {
-		http.NotFound(w, r)
+		// Use the new notFoundResponse() helper.
+		app.notFoundResponse(w, r)
 		return
 	}
 
@@ -30,12 +29,10 @@ func (app *application) showMovieHandler(w http.ResponseWriter, r *http.Request)
 		Version:   1,
 	}
 
-	// Create an envelope{"movie": movie} instance and pass it to writeJSON(), instead
-	// of passing the plain movie struct.
 	err = app.writeJSON(w, http.StatusOK, envelope{"movie": movie}, nil)
 
 	if err != nil {
-		app.logger.Print(err)
-		http.Error(w, "The server encountered a problem and could not process your request", http.StatusInternalServerError)
+		// Use the new serverErrorResponse() helper.
+		app.serverErrorResponse(w, r, err)
 	}
 }
