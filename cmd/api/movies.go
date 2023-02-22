@@ -15,7 +15,7 @@ func (app *application) createMovieHandler(w http.ResponseWriter, r *http.Reques
 		Runtime data.Runtime `json:"runtime"`
 		Genres  []string     `json:"genres"`
 	}
-	
+
 	err := app.readJSON(w, r, &input)
 
 	if err != nil {
