@@ -213,7 +213,6 @@ func (app *application) deleteMovieHandler(w http.ResponseWriter, r *http.Reques
 }
 
 func (app *application) listMoviesHandler(w http.ResponseWriter, r *http.Request) {
-	// Embed the new Filters struct.
 	var input struct {
 		Title  string
 		Genres []string
@@ -221,19 +220,20 @@ func (app *application) listMoviesHandler(w http.ResponseWriter, r *http.Request
 	}
 
 	v := validator.New()
-
 	qs := r.URL.Query()
 
 	input.Title = app.readString(qs, "title", "")
 	input.Genres = app.readCSV(qs, "genres", []string{})
-
-	// Read the page and page_size query string values into the embedded struct.
 	input.Filters.Page = app.readInt(qs, "page", 1, v)
 	input.Filters.PageSize = app.readInt(qs, "page_size", 20, v)
-
-	// Read the sort query string value into the embedded struct.
 	input.Filters.Sort = app.readString(qs, "sort", "id")
-	if !v.Valid() {
+
+	// Add the supported sort values for this endpoint to the sort safelist.
+	input.Filters.SortSafelist = []string{"id", "title", "year", "runtime", "-id", "-title", "-year", "-runtime"}
+
+	// Execute the validation checks on the Filters struct and send a response
+	// containing the errors if necessary.
+	if data.ValidateFilters(v, input.Filters); !v.Valid() {
 		app.failedValidationResponse(w, r, v.Errors)
 		return
 	}
