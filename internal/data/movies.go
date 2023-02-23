@@ -184,20 +184,27 @@ func (m MovieModel) Delete(id int64) error {
 }
 
 func (m MovieModel) GetAll(title string, genres []string, filters Filters) ([]*Movie, error) {
-	// Add an ORDER BY clause and interpolate the sort column and direction. Importantly
-	// notice that we also include a secondary sort on the movie ID to ensure a
-	// consistent ordering.
+	// Update the SQL query to include the LIMIT and OFFSET clauses with placeholder
+	// parameter values.
 	query := fmt.Sprintf(`
 		SELECT id, created_at, title, year, runtime, genres, version
 		FROM movies
 		WHERE (to_tsvector('simple', title) @@ plainto_tsquery('simple', $1) OR $1 = '')
 		AND (genres @> $2 OR $2 = '{}')
-		ORDER BY %s %s, id ASC`, filters.sortColumn(), filters.sortDirection())
+		ORDER BY %s %s, id ASC
+		LIMIT $3 OFFSET $4`, filters.sortColumn(), filters.sortDirection())
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	rows, err := m.DB.QueryContext(ctx, query, title, pq.Array(genres))
+	// As our SQL query now has quite a few placeholder parameters, let's collect the
+	// values for the placeholders in a slice. Notice here how we call the limit() and
+	// offset() methods on the Filters struct to get the appropriate values for the
+	// LIMIT and OFFSET clauses.
+	args := []any{title, pq.Array(genres), filters.limit(), filters.offset()}
+
+	// And then pass the args slice to QueryContext() as a variadic parameter.
+	rows, err := m.DB.QueryContext(ctx, query, args...)
 
 	if err != nil {
 		return nil, err
