@@ -183,11 +183,11 @@ func (m MovieModel) Delete(id int64) error {
 }
 
 func (m MovieModel) GetAll(title string, genres []string, filters Filters) ([]*Movie, error) {
-	// Update the SQL query to include the filter conditions.
+	// Use full-text search for the title filter.
 	query := `
 		SELECT id, created_at, title, year, runtime, genres, version
 		FROM movies
-		WHERE (LOWER(title) = LOWER($1) OR $1 = '')
+		WHERE (to_tsvector('simple', title) @@ plainto_tsquery('simple', $1) OR $1 = '')
 		AND (genres @> $2 OR $2 = '{}')
 		ORDER BY id
 	`
@@ -195,7 +195,6 @@ func (m MovieModel) GetAll(title string, genres []string, filters Filters) ([]*M
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	// Pass the title and genres as the placeholder parameter values.
 	rows, err := m.DB.QueryContext(ctx, query, title, pq.Array(genres))
 
 	if err != nil {
@@ -228,6 +227,6 @@ func (m MovieModel) GetAll(title string, genres []string, filters Filters) ([]*M
 	if err = rows.Err(); err != nil {
 		return nil, err
 	}
-	
+
 	return movies, nil
 }
