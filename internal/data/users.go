@@ -210,6 +210,6 @@ func (m UserModel) Update(user *User) error {
 			return err
 		}
 	}
-	
+
 	return nil
 }
