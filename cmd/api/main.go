@@ -4,10 +4,8 @@ import (
 	"context"      // New import
 	"database/sql" // New import
 	"flag"
-	"fmt"
 	"greenlight.adrianescat.com/internal/data"
 	"greenlight.adrianescat.com/internal/jsonlog"
-	"net/http"
 	"os"
 	"time"
 	// Import the pq driver so that it can register itself with the database/sql
@@ -87,26 +85,11 @@ func main() {
 		models: data.NewModels(db),
 	}
 
-	srv := &http.Server{
-		Addr:         fmt.Sprintf(":%d", cfg.port),
-		Handler:      app.routes(),
-		IdleTimeout:  time.Minute,
-		ReadTimeout:  10 * time.Second,
-		WriteTimeout: 30 * time.Second,
+	// Call app.serve() to start the server.
+	err = app.serve()
+	if err != nil {
+		logger.PrintFatal(err, nil)
 	}
-
-	// Again, we use the PrintInfo() method to write a "starting server" message at the
-	// INFO level. But this time we pass a map containing additional properties (the
-	// operating environment and server address) as the final parameter.
-	logger.PrintInfo("starting server", map[string]string{
-		"addr": srv.Addr,
-		"env":  cfg.env,
-	})
-
-	err = srv.ListenAndServe()
-
-	// Use the PrintFatal() method to log the error and exit.
-	logger.PrintFatal(err, nil)
 }
 
 func openDB(cfg config) (*sql.DB, error) {
