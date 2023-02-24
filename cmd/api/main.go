@@ -29,6 +29,14 @@ type config struct {
 		maxIdleConns int
 		maxIdleTime  string
 	}
+	// Add a new limiter struct containing fields for the requests-per-second and burst
+	// values, and a boolean field which we can use to enable/disable rate limiting
+	// altogether.
+	limiter struct {
+		rps     float64
+		burst   int
+		enabled bool
+	}
 }
 
 type application struct {
@@ -47,6 +55,12 @@ func main() {
 	flag.IntVar(&cfg.db.maxOpenConns, "db-max-open-conns", 25, "PostgreSQL max open connections")
 	flag.IntVar(&cfg.db.maxIdleConns, "db-max-idle-conns", 25, "PostgreSQL max idle connections")
 	flag.StringVar(&cfg.db.maxIdleTime, "db-max-idle-time", "15m", "PostgreSQL max connection idle time")
+
+	// Create command line flags to read the setting values into the config struct.
+	// Notice that we use true as the default for the 'enabled' setting?
+	flag.Float64Var(&cfg.limiter.rps, "limiter-rps", 2, "Rate limiter maximum requests per second")
+	flag.IntVar(&cfg.limiter.burst, "limiter-burst", 4, "Rate limiter maximum burst")
+	flag.BoolVar(&cfg.limiter.enabled, "limiter-enabled", true, "Enable rate limiter")
 
 	flag.Parse()
 
