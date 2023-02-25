@@ -8,6 +8,7 @@ import (
 	"greenlight.adrianescat.com/internal/jsonlog"
 	"greenlight.adrianescat.com/internal/mailer"
 	"os"
+	"sync"
 	"time"
 	// Import the pq driver so that it can register itself with the database/sql
 	// package. Note that we alias this import to the blank identifier, to stop the Go
@@ -50,6 +51,7 @@ type application struct {
 	logger *jsonlog.Logger
 	models data.Models
 	mailer mailer.Mailer
+	wg     sync.WaitGroup
 }
 
 func main() {
