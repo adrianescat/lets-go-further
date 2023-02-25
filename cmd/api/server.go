@@ -76,6 +76,6 @@ func (app *application) serve() error {
 	app.logger.PrintInfo("stopped server", map[string]string{
 		"addr": srv.Addr,
 	})
-	
+
 	return nil
 }
