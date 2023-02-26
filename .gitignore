@@ -18,3 +18,4 @@
 .idea
 .vscode
 .envrc
+bin/
