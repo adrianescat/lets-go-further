@@ -112,7 +112,7 @@ func (l *Logger) print(level Level, message string, properties map[string]string
 	// log entries will be intermingled in the output.
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	
+
 	// Write the log entry followed by a newline.
 	return l.out.Write(append(line, '\n'))
 }

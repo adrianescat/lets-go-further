@@ -95,6 +95,6 @@ func (m Mailer) Send(recipient, templateFile string, data any) error {
 	if err != nil {
 		return err
 	}
-	
+
 	return nil
 }

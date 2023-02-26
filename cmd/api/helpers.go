@@ -200,7 +200,7 @@ func (app *application) background(fn func()) {
 				app.logger.PrintError(fmt.Errorf("%s", err), nil)
 			}
 		}()
-		
+
 		fn()
 	}()
 }

@@ -68,6 +68,6 @@ func (r *Runtime) UnmarshalJSON(jsonValue []byte) error {
 	// use the * operator to deference the receiver (which is a pointer to a Runtime
 	// type) in order to set the underlying value of the pointer.
 	*r = Runtime(i)
-	
+
 	return nil
 }

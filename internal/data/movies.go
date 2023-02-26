@@ -240,7 +240,7 @@ func (m MovieModel) GetAll(title string, genres []string, filters Filters) ([]*M
 	// Generate a Metadata struct, passing in the total record count and pagination
 	// parameters from the client.
 	metadata := calculateMetadata(totalRecords, filters.Page, filters.PageSize)
-	
+
 	// Include the metadata struct when returning.
 	return movies, metadata, nil
 }
