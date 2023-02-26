@@ -1,3 +1,6 @@
+# Include variables from the .envrc file
+include .envrc
+
 ## help: print this help message
 help:
 	@echo 'Usage:'
@@ -8,16 +11,16 @@ confirm:
 
 ## run/api: run the cmd/api application
 run/api:
-	go run ./cmd/api
+	go run ./cmd/api -db-dsn=${GREENLIGHT_DB_DSN}
 
 ## db/psql: connect to the database using psql
 db/psql:
-	psql postgres://greenlight:pa55word@localhost/greenlight?sslmode=disable
+	psql ${GREENLIGHT_DB_DSN}
 
 ## db/migrations/up: apply all up database migrations
 db/migrations/up: confirm
 	@echo 'Running up migrations...'
-	migrate -path ./migrations -database postgres://greenlight:pa55word@localhost/greenlight?sslmode=disable up
+	migrate -path ./migrations -database ${GREENLIGHT_DB_DSN} up
 
 ## db/migrations/new name=$1: create a new database migration
 db/migrations/new: confirm

@@ -17,3 +17,4 @@
 # Environment
 .idea
 .vscode
+.envrc
