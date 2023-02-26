@@ -4,9 +4,11 @@ import (
 	"context"      // New import
 	"database/sql" // New import
 	"flag"
+	"fmt"
 	"greenlight.adrianescat.com/internal/data"
 	"greenlight.adrianescat.com/internal/jsonlog"
 	"greenlight.adrianescat.com/internal/mailer"
+	"greenlight.adrianescat.com/internal/vcs"
 	"os"
 	"strings"
 	"sync"
@@ -17,7 +19,9 @@ import (
 	_ "github.com/lib/pq"
 )
 
-const version = "1.0.0"
+var (
+	version = vcs.Version()
+)
 
 // Add maxOpenConns, maxIdleConns and maxIdleTime fields to hold the configuration
 // settings for the connection pool.
@@ -96,7 +100,17 @@ func main() {
 		return nil
 	})
 
+	// Create a new version boolean flag with the default value of false.
+	displayVersion := flag.Bool("version", false, "Display version and exit")
+
 	flag.Parse()
+
+	// If the version flag value is true, then print out the version number and
+	// immediately exit.
+	if *displayVersion {
+		fmt.Printf("Version:\t%s\n", version)
+		os.Exit(0)
+	}
 
 	// Initialize a new jsonlog.Logger which writes any messages *at or above* the INFO
 	// severity level to the standard out stream.
